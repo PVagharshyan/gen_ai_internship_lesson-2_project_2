@@ -34,6 +34,9 @@ class Point2D:
         self.x = x
         self.y = y
 
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
 def find_line_equation(p1: Point2D, p2: Point2D) -> (tuple,int):
     
     """Returns the coefficients of the line passing through the corresponding points"""
@@ -70,7 +73,8 @@ class Point2DSequence:
         mapValue = {}
         
         for i in value:
-            mapValue[i] = 0
+            if i not in mapValue.keys():
+                mapValue[i] = 0
             mapValue[i] += 1
         
         value = []
@@ -79,13 +83,17 @@ class Point2DSequence:
             value.append(i)
 
         if len(mapValue) < 3:
-            raise ValueError("These coordinates do not satisfy the polygon definition!!")
-        elif len(mapValue) == 3:
-            p1 = value[0]
-            p2 = value[1]
-            p3 = value[2]
-            if find_line_equation(p1, p2) == find_line_equation(p2, p3):
-                raise ValueError("These coordinates do not satisfy the polygon definition!!")
+            raise ValueError("these coordinates do not satisfy the polygon definition!!")
+        mapCheckPoints = {}
+        for i in range(len(value)):
+            for j in range(i + 1, len(value)):
+                line = find_line_equation(value[i], value[j])
+                if line not in mapCheckPoints:
+                    mapCheckPoints[line] = 0
+                mapCheckPoints[line] += 1
+        if len(mapCheckPoints) < 2:
+            raise ValueError("these coordinates do not satisfy the polygon definition!!")
+
         instance.__dict__[self.vertices] = value
     
 class Polygon:
@@ -96,6 +104,11 @@ class Polygon:
 
     def __init__(self, *vertices):
         self.vertices = vertices
+    
+    def __str__(self):
+        text = [str(i) for i in self.vertices]
+        text = ', '.join(text)
+        return f"vertices: {text}"
 
     def append(self, *app: Point2D):
 
@@ -105,16 +118,14 @@ class Polygon:
 
 #Testing
 
-p1 = Point2D(1, 100)
-p2 = Point2D(1, 2)
-p3 = Point2D(0, 0)
-p4 = Point2D(0, 0)
-p5 = Point2D(0, 0)
+p1 = Point2D(1, 1)
+p2 = Point2D(2, 2)
+p3 = Point2D(4, 3)
+p4 = Point2D(6, 4)
+p5 = Point2D(5, 5)
 p6 = Point2D(0, 0)
 
 polygon = Polygon(p1, p2, p3)
-polygon.append(p3)
-
-print(polygon.vertices)
+print(polygon)
 
 
